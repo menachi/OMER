@@ -1,0 +1,20 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.compile.nullAnalysis.mode": "disabled",
+  "java.configuration.detectJavaDebugConfiguration": true,
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.import.maven.enabled": true,
+  "java.sources.organizeImports.starThreshold": 99,
+  "java.sources.organizeImports.staticStarThreshold": 99,
+  "java.project.sourcePaths": ["src/main/java"],
+  "java.project.resourcePaths": ["src/main/resources"],
+  "java.project.outputPath": "build/classes",
+  "files.exclude": {
+    "**/.gradle": true,
+    "**/build": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.factorypath": true
+  }
+}

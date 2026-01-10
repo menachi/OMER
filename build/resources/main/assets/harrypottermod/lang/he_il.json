@@ -1,0 +1,13 @@
+{
+    "item.harrypottermod.wand": "שרבית קסמים",
+    "itemGroup.harrypottermod": "מוד הארי פוטר",
+    "spell.lumos": "לומוש",
+    "spell.nox": "נוקס",
+    "key.categories.harrypottermod": "מוד הארי פוטר",
+    "key.harrypottermod.lumos": "הפעל לומוש (Z)",
+    "key.harrypottermod.spell2": "הפעל כישוף 2 (C)",
+    "key.harrypottermod.spell3": "הפעל כישוף 3 (V)",
+    "key.harrypottermod.spell4": "הפעל כישוף 4 (B)",
+    "key.harrypottermod.spell5": "הפעל כישוף 5 (N)",
+    "key.harrypottermod.next_spell": "הפעל כישוף נבחר (X)"
+}
