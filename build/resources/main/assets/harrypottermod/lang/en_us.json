@@ -1,14 +1,14 @@
 {
-    "item.harrypottermod.wand": "Magic Wand",
-    "itemGroup.harrypottermod": "Harry Potter",
-    "spell.lumos": "Lumos",
-    "spell.nox": "Nox",
-    "spell.expelliarmus": "Expelliarmus",
-    "key.categories.harrypottermod": "Harry Potter Mod",
-    "key.harrypottermod.lumos": "Cast Lumos (Z)",
-    "key.harrypottermod.spell2": "Cast Spell 2 (C)",
-    "key.harrypottermod.spell3": "Cast Spell 3 (V)",
-    "key.harrypottermod.spell4": "Cast Spell 4 (B)",
-    "key.harrypottermod.spell5": "Cast Spell 5 (N)",
-    "key.harrypottermod.next_spell": "Cast Selected Spell (X)"
+    "item.harrypottermod.wand": "Wooden Stick",
+    "itemGroup.harrypottermod": "Wooden Items",
+    "spell.lumos": "Light",
+    "spell.nox": "Dark",
+    "spell.expelliarmus": "Push",
+    "key.categories.harrypottermod": "Wooden Tools",
+    "key.harrypottermod.lumos": "Use Tool (Z)",
+    "key.harrypottermod.spell2": "Function 2 (C)",
+    "key.harrypottermod.spell3": "Function 3 (V)",
+    "key.harrypottermod.spell4": "Function 4 (B)",
+    "key.harrypottermod.spell5": "Function 5 (N)",
+    "key.harrypottermod.next_spell": "Use Selected (X)"
 }

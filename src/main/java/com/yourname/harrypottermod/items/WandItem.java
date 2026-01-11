@@ -180,32 +180,6 @@ public class WandItem extends Item {
             }
         }
     }
-    
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        // אתחול מנא
-        ManaSystem.initializeMana(stack);
-        ManaSystem.updateManaRegen(stack);
-        
-        int currentMana = ManaSystem.getCurrentMana(stack);
-        int maxMana = ManaSystem.MAX_MANA;
-        
-        // הוספת שורת מנא
-        MutableComponent manaText = Component.literal("Mana: ")
-            .withStyle(ChatFormatting.BLUE)
-            .append(Component.literal(currentMana + "/" + maxMana)
-            .withStyle(ChatFormatting.AQUA));
-        tooltip.add(manaText);
-        
-        // הוספת פס מנא ויזואלי
-        tooltip.add(Component.literal(ManaSystem.getManaBarSimple(stack)));
-        
-        // הוספת מידע על כישופים
-        tooltip.add(Component.literal("Lumos: 20 mana").withStyle(ChatFormatting.YELLOW));
-        tooltip.add(Component.literal("Nox: 5 mana").withStyle(ChatFormatting.GRAY));
-        
-        super.appendHoverText(stack, level, tooltip, flag);
-    }
 
     private void switchSpell(ItemStack stack, Player player) {
         // החלפה ללחש הבא
@@ -228,8 +202,30 @@ public class WandItem extends Item {
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        // השרביט יזהיר כשהוא דולק או כמו פריט קסום רגיל
-        CompoundTag tag = stack.getTag();
-        return tag != null && tag.getBoolean("glowing") || true;
+        // הסרת הזוהר הקסום - השרביט לא יזהיר
+        return false;
+    }
+    
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        // הסרת מידע מיותר ו-tooltips חשופים
+        tooltip.clear();
+        
+        // הוספת מידע בסיסי בלבד
+        tooltip.add(Component.literal("A magical wand").withStyle(ChatFormatting.GRAY));
+        
+        // הצגת מנא רק אם יש
+        if (stack.hasTag() && stack.getTag().contains("mana")) {
+            int mana = stack.getTag().getInt("mana");
+            tooltip.add(Component.literal("Mana: " + mana + "/100").withStyle(ChatFormatting.BLUE));
+        }
+        
+        // הצגת כישוף נוכחי - בלי מידע מפורט
+        if (stack.hasTag() && stack.getTag().contains("selectedSpell")) {
+            int spellIndex = stack.getTag().getInt("selectedSpell");
+            if (spellIndex == 0) {
+                tooltip.add(Component.literal("Function: Light").withStyle(ChatFormatting.GOLD));
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 {
   "minecraft:adventure/adventuring_time": {
     "criteria": {
+      "minecraft:stony_shore": "2026-01-11 07:40:19 +0200",
       "minecraft:desert": "2026-01-10 20:56:22 +0200"
     },
     "done": false

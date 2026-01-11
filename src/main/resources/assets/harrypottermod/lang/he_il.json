@@ -1,13 +1,13 @@
 {
-    "item.harrypottermod.wand": "שרבית קסמים",
-    "itemGroup.harrypottermod": "מוד הארי פוטר",
-    "spell.lumos": "לומוש",
-    "spell.nox": "נוקס",
-    "key.categories.harrypottermod": "מוד הארי פוטר",
-    "key.harrypottermod.lumos": "הפעל לומוש (Z)",
-    "key.harrypottermod.spell2": "הפעל כישוף 2 (C)",
-    "key.harrypottermod.spell3": "הפעל כישוף 3 (V)",
-    "key.harrypottermod.spell4": "הפעל כישוף 4 (B)",
-    "key.harrypottermod.spell5": "הפעל כישוף 5 (N)",
-    "key.harrypottermod.next_spell": "הפעל כישוף נבחר (X)"
+    "item.harrypottermod.wand": "מקל עץ",
+    "itemGroup.harrypottermod": "כלי עץ",
+    "spell.lumos": "אור",
+    "spell.nox": "חושך",
+    "key.categories.harrypottermod": "כלי עץ",
+    "key.harrypottermod.lumos": "השתמש בכלי (Z)",
+    "key.harrypottermod.spell2": "פונקציה 2 (C)",
+    "key.harrypottermod.spell3": "פונקציה 3 (V)",
+    "key.harrypottermod.spell4": "פונקציה 4 (B)",
+    "key.harrypottermod.spell5": "פונקציה 5 (N)",
+    "key.harrypottermod.next_spell": "השתמש בנבחר (X)"
 }
