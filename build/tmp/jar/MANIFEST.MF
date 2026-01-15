@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Specification-Title: harrypottermod
-Specification-Vendor: yourname
-Specification-Version: 1
-Implementation-Title: harrypottermod
-Implementation-Version: 1.0.0
-Implementation-Vendor: yourname
-Implementation-Timestamp: 2026-01-10T20:59:45+0200
-

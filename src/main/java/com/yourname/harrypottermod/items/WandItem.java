@@ -30,13 +30,18 @@ public class WandItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         
-        // אתחול מנא מלא תמיד
-        ManaSystem.initializeMana(stack);
+        // אתחול מנא רק אם עוד לא הוגדרה
+        if (!stack.hasTag() || !stack.getTag().contains("current_mana")) {
+            ManaSystem.initializeMana(stack, level.getGameTime());
+        } else {
+            // עדכון התחדשות המנא בלבד
+            ManaSystem.updateManaRegen(stack, level.getGameTime());
+        }
         
         if (!level.isClientSide()) {
             if (player.isCrouching()) {
                 // כשהשחקן בקרוב ולוחץ ימין - מחליף כישוף
-                switchSpell(stack, player);
+                switchSpell(stack, player, level);
             } else {
                 // כשהשחקן לוחץ ימין רגיל - מבצע כישוף
                 castSpell(stack, level, player);
@@ -48,9 +53,12 @@ public class WandItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, Level level, net.minecraft.world.entity.Entity entity, int slot, boolean selected) {
         if (!level.isClientSide() && entity instanceof Player player) {
-            // וידוא שהמנא מתחילה מלא ועדכון התחדשות
-            ManaSystem.initializeMana(stack);
-            ManaSystem.updateManaRegen(stack);
+            // וידוא שהמנא הוגדרה ועדכון התחדשות
+            if (!stack.hasTag() || !stack.getTag().contains("current_mana")) {
+                ManaSystem.initializeMana(stack, level.getGameTime());
+            } else {
+                ManaSystem.updateManaRegen(stack, level.getGameTime());
+            }
             
             // בדיקה אם השחקן מחזיק שרביט דולק שלא ביד הפעילה
             if (!isWandInActiveHand(player, stack)) {
@@ -58,12 +66,17 @@ public class WandItem extends Item {
                 return;
             }
             
+            // הצגת מנא כל כמה שניות כשהשחקן מחזיק השרביט
+            long gameTime = level.getGameTime();
+            if (selected && gameTime % 100 == 0) { // כל 5 שניות
+                player.sendSystemMessage(Component.literal(ManaSystem.getManaBar(stack)));
+            }
+            
             CompoundTag tag = stack.getTag();
             if (tag != null && tag.getBoolean("glowing")) {
-                long currentTime = level.getGameTime();
                 long glowTime = tag.getLong("glowTime");
                 
-                if (currentTime < glowTime) {
+                if (gameTime < glowTime) {
                     // השרביט עדיין צריך להאיר
                     BlockPos playerPos = player.blockPosition();
                     int lastX = tag.getInt("lastX");
@@ -181,7 +194,10 @@ public class WandItem extends Item {
         }
     }
 
-    private void switchSpell(ItemStack stack, Player player) {
+    private void switchSpell(ItemStack stack, Player player, Level level) {
+        // עדכון מנא לפני הצגה
+        ManaSystem.updateManaRegen(stack, level.getGameTime());
+        
         // החלפה ללחש הבא
         SpellSelection.nextSpell(player.getUUID(), SpellManager.getSpellCount());
         int selectedIndex = SpellSelection.getSelectedSpell(player.getUUID());

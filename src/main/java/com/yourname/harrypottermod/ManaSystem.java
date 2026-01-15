@@ -7,7 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 public class ManaSystem {
     
     public static final int MAX_MANA = 100;
-    public static final int MANA_REGEN_RATE = 1; // מנא לשנייה
+    public static final int MANA_REGEN_RATE = 2; // 2 מנא לשנייה
     
     // עלויות כישופים
     public static final int LUMOS_COST = 20;
@@ -33,30 +33,51 @@ public class ManaSystem {
         tag.putLong("last_mana_update", time);
     }
     
-    public static void initializeMana(ItemStack wand) {
+    public static void initializeMana(ItemStack wand, long gameTime) {
         CompoundTag tag = wand.getOrCreateTag();
-        // תמיד מתחיל עם מנא מלא - לא משנה מה
+        // תמיד מתחיל עם מנא מלא
         tag.putInt("current_mana", MAX_MANA);
-        tag.putLong("last_mana_update", System.currentTimeMillis());
+        tag.putLong("last_mana_update", gameTime);
     }
     
-    public static void updateManaRegen(ItemStack wand) {
-        long currentTime = System.currentTimeMillis();
+    // פונקציה עם ברירת מחדל לתאימות לאחור
+    public static void initializeMana(ItemStack wand) {
+        CompoundTag tag = wand.getOrCreateTag();
+        tag.putInt("current_mana", MAX_MANA);
+        tag.putLong("last_mana_update", 0);
+    }
+    
+    public static void updateManaRegen(ItemStack wand, long gameTime) {
         long lastUpdate = getLastManaUpdate(wand);
-        long timeDiff = currentTime - lastUpdate;
         
-        if (timeDiff >= 1000) { // שנייה עברה
-            int secondsPassed = (int) (timeDiff / 1000);
-            int currentMana = getCurrentMana(wand);
-            int newMana = Math.min(MAX_MANA, currentMana + (secondsPassed * MANA_REGEN_RATE));
+        // אם המנא כבר מלא, אין צורך לעדכן
+        int currentMana = getCurrentMana(wand);
+        if (currentMana >= MAX_MANA) {
+            setLastManaUpdate(wand, gameTime);
+            return;
+        }
+        
+        // אם זה הפעם הראשון או lastUpdate הוא 0, אתחל מהזמן הנוכחי
+        if (lastUpdate == 0) {
+            setLastManaUpdate(wand, gameTime);
+            return;
+        }
+        
+        long timeDiff = gameTime - lastUpdate;
+        
+        // בדיקה אם עברה לפחות שנייה
+        if (timeDiff >= 20) { // שנייה עברה (20 ticks)
+            // מעדכנים רק שנייה אחת בכל פעם למנוע קפיצות
+            int manaToAdd = Math.min((int)(timeDiff / 20), 5); // מקסימום 5 מנא בכל עדכון
+            int newMana = Math.min(MAX_MANA, currentMana + manaToAdd);
             
             setCurrentMana(wand, newMana);
-            setLastManaUpdate(wand, currentTime);
+            setLastManaUpdate(wand, gameTime);
         }
     }
     
-    public static boolean consumeMana(ItemStack wand, int amount) {
-        updateManaRegen(wand);
+    public static boolean consumeMana(ItemStack wand, int amount, long gameTime) {
+        updateManaRegen(wand, gameTime);
         int currentMana = getCurrentMana(wand);
         
         if (currentMana >= amount) {

@@ -1,0 +1,11 @@
+{
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:taiga": "2026-01-15 15:54:57 +0200",
+      "minecraft:birch_forest": "2026-01-15 15:55:09 +0200",
+      "minecraft:stony_shore": "2026-01-11 14:49:25 +0200"
+    },
+    "done": false
+  },
+  "DataVersion": 3120
+}

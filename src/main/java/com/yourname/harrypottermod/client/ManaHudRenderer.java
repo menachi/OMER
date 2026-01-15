@@ -47,8 +47,11 @@ public class ManaHudRenderer {
         
         if (wandStack != null) {
             // אתחול ועדכון מנא
-            ManaSystem.initializeMana(wandStack);
-            ManaSystem.updateManaRegen(wandStack);
+            if (!wandStack.hasTag() || !wandStack.getTag().contains("current_mana")) {
+                ManaSystem.initializeMana(wandStack, mc.level.getGameTime());
+            } else {
+                ManaSystem.updateManaRegen(wandStack, mc.level.getGameTime());
+            }
             
             // קבלת מידע על המנא
             int currentMana = ManaSystem.getCurrentMana(wandStack);

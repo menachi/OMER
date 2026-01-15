@@ -15,42 +15,51 @@ public class LumosSpell extends Spell {
     }
 
     @Override
-    public void cast(Level level, Player player) {
+    public boolean castWithWand(Level level, Player player, ItemStack wand) {
         if (!level.isClientSide()) {
-            // מוצא את השרביט ביד הראשית
-            ItemStack wandInHand = player.getMainHandItem();
+            // בדיקה אם השרביט כבר דולק
+            boolean isGlowing = wand.getOrCreateTag().getBoolean("glowing");
             
-            if (!wandInHand.isEmpty()) {
-                // בדיקה אם השרביט כבר דולק
-                boolean isGlowing = wandInHand.getOrCreateTag().getBoolean("glowing");
-                
-                if (isGlowing) {
-                    // כיבוי הכישוף הפעיל
-                    turnOffWand(level, player, wandInHand);
-                } else {
-                    // הפעלת כישוף חדש
-                    // בדיקה אם יש מספיק מנא
-                    if (!ManaSystem.consumeMana(wandInHand, ManaSystem.LUMOS_COST)) {
-                        player.sendSystemMessage(Component.literal("§cNot enough mana! " + ManaSystem.getManaBar(wandInHand)));
-                        return;
-                    }
-                    
-                    // מוסיף NBT tag שיגרום לשרביט להאיר
-                    wandInHand.getOrCreateTag().putBoolean("glowing", true);
-                    wandInHand.getOrCreateTag().putLong("glowTime", level.getGameTime() + 600); // 30 שניות
-                    
-                    // שומר את המיקום הנוכחי של השחקן
-                    BlockPos playerPos = player.blockPosition();
-                    wandInHand.getOrCreateTag().putInt("lastX", playerPos.getX());
-                    wandInHand.getOrCreateTag().putInt("lastY", playerPos.getY());
-                    wandInHand.getOrCreateTag().putInt("lastZ", playerPos.getZ());
-                    
-                    player.sendSystemMessage(Component.literal("Lumos! Your wand glows with magical light!"));
-                    
-                    // הצגת מנא נוכחי תמיד
-                    player.sendSystemMessage(Component.literal(ManaSystem.getManaBar(wandInHand)));
+            if (isGlowing) {
+                // כיבוי הכישוף הפעיל - NOX (עלות נמוכה יותר)
+                if (!ManaSystem.consumeMana(wand, ManaSystem.NOX_COST, level.getGameTime())) {
+                    player.sendSystemMessage(Component.literal("§cNot enough mana! " + ManaSystem.getManaBar(wand)));
+                    return false;
                 }
+                turnOffWand(level, player, wand);
+            } else {
+                // הפעלת כישוף חדש - LUMOS (עלות גבוהה יותר)
+                if (!ManaSystem.consumeMana(wand, ManaSystem.LUMOS_COST, level.getGameTime())) {
+                    player.sendSystemMessage(Component.literal("§cNot enough mana! " + ManaSystem.getManaBar(wand)));
+                    return false;
+                }
+                
+                // מוסיף NBT tag שיגרום לשרביט להאיר
+                wand.getOrCreateTag().putBoolean("glowing", true);
+                wand.getOrCreateTag().putLong("glowTime", level.getGameTime() + 600); // 30 שניות
+                
+                // שומר את המיקום הנוכחי של השחקן
+                BlockPos playerPos = player.blockPosition();
+                wand.getOrCreateTag().putInt("lastX", playerPos.getX());
+                wand.getOrCreateTag().putInt("lastY", playerPos.getY());
+                wand.getOrCreateTag().putInt("lastZ", playerPos.getZ());
+                
+                player.sendSystemMessage(Component.literal("Lumos! Your wand glows with magical light!"));
             }
+            
+            // הצגת מנא נוכחי תמיד
+            player.sendSystemMessage(Component.literal(ManaSystem.getManaBar(wand)));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void cast(Level level, Player player) {
+        // הפונקציה הישנה - לא בשימוש יותר
+        ItemStack wandInHand = player.getMainHandItem();
+        if (!wandInHand.isEmpty()) {
+            castWithWand(level, player, wandInHand);
         }
     }
     

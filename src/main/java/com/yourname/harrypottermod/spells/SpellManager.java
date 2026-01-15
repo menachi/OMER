@@ -27,9 +27,12 @@ public class SpellManager {
     public static boolean castSpell(int spellIndex, Level level, Player player) {
         Spell spell = getSpellByIndex(spellIndex);
         if (spell != null) {
-            // כאן אפשר לבדוק mana או תנאים אחרים
-            spell.cast(level, player);
-            return true;
+            // מוצא את השרביט ביד הראשית
+            net.minecraft.world.item.ItemStack wandStack = player.getMainHandItem();
+            if (!wandStack.isEmpty()) {
+                // מעביר את השרביט לקסם לבדיקת מנא
+                return spell.castWithWand(level, player, wandStack);
+            }
         }
         return false;
     }
