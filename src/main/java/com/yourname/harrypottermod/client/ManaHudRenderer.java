@@ -107,10 +107,15 @@ public class ManaHudRenderer {
     }
     
     private static void renderSelectedSpell(RenderGuiOverlayEvent.Post event, Minecraft mc, Player player, int screenWidth, int screenHeight) {
-        int selectedIndex = SpellSelection.getSelectedSpell(player.getUUID());
-        Spell selectedSpell = SpellManager.getSpellByIndex(selectedIndex);
+        // קבלת קסמים נלמדים בלבד
+        List<Spell> learnedSpells = SpellManager.getLearnedSpells(player);
+        if (learnedSpells.isEmpty()) {
+            return; // אין קסמים נלמדים - לא מציג כלום
+        }
         
-        if (selectedSpell != null) {
+        int selectedIndex = SpellSelection.getSelectedSpell(player.getUUID());
+        if (selectedIndex >= 0 && selectedIndex < learnedSpells.size()) {
+            Spell selectedSpell = learnedSpells.get(selectedIndex);
             String spellText = "Current: " + selectedSpell.getName();
             int textWidth = mc.font.width(spellText);
             
@@ -141,7 +146,8 @@ public class ManaHudRenderer {
     }
     
     private static void renderSpellIndicators(RenderGuiOverlayEvent.Post event, Minecraft mc, Player player, int screenWidth, int screenHeight) {
-        List<Spell> spells = SpellManager.getAllSpells();
+        // קבלת רק קסמים נלמדים
+        List<Spell> learnedSpells = SpellManager.getLearnedSpells(player);
         int maxSpells = 5; // תמיד 5 ריבועים
         
         // מיקום בצד ימין תחתון
@@ -154,9 +160,9 @@ public class ManaHudRenderer {
             int iconY = startY;
             int iconSize = 18; // גודל איקון
             
-            if (i < spells.size()) {
-                // יש כישוף במיקום הזה
-                Spell spell = spells.get(i);
+            if (i < learnedSpells.size()) {
+                // יש כישוף נלמד במיקום הזה
+                Spell spell = learnedSpells.get(i);
                 
                 // בדיקה אם זה הלחש הנבחר
                 int selectedIndex = SpellSelection.getSelectedSpell(player.getUUID());
@@ -188,7 +194,7 @@ public class ManaHudRenderer {
                 int numberY = iconY - 8;
                 mc.font.draw(event.getPoseStack(), number, numberX, numberY, 0xFFFFFFFF);
             } else {
-                // משבצת ריקה - אין כישוף במיקום הזה
+                // משבצת ריקה - אין כישוף נלמד במיקום הזה
                 int backgroundColor = 0xFF333333; // אפור כהה
                 int borderColor = 0xFF000000; // גבול שחור
                 

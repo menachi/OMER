@@ -2,6 +2,7 @@ package com.yourname.harrypottermod.init;
 
 import com.yourname.harrypottermod.HarryPotterMod;
 import com.yourname.harrypottermod.items.WandItem;
+import com.yourname.harrypottermod.items.LumosSpellBookItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -14,6 +15,10 @@ public class ItemInit {
     // השרבית - מתחילה עם טקסטורה של מקל
     public static final RegistryObject<Item> WAND = ITEMS.register("wand",
         () -> new WandItem(new Item.Properties().tab(CreativeTabInit.HARRY_POTTER_TAB).stacksTo(1)));
+    
+    // ספר קסם לומוס
+    public static final RegistryObject<Item> LUMOS_SPELL_BOOK = ITEMS.register("lumos_spell_book",
+        () -> new LumosSpellBookItem(new Item.Properties().tab(CreativeTabInit.HARRY_POTTER_TAB).stacksTo(1)));
     
     // הסרנו את שמלת הלומוש
 }

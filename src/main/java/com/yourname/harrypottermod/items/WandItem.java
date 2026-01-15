@@ -3,6 +3,7 @@ package com.yourname.harrypottermod.items;
 import com.yourname.harrypottermod.spells.SpellManager;
 import com.yourname.harrypottermod.spells.Spell;
 import com.yourname.harrypottermod.ManaSystem;
+import com.yourname.harrypottermod.LearnedSpells;
 import com.yourname.harrypottermod.client.SpellSelection;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
@@ -29,6 +30,11 @@ public class WandItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        
+        // טען קסמים נלמדים מ-NBT
+        if (!level.isClientSide()) {
+            LearnedSpells.loadPlayerSpells(player);
+        }
         
         // אתחול מנא רק אם עוד לא הוגדרה
         if (!stack.hasTag() || !stack.getTag().contains("current_mana")) {
@@ -198,21 +204,50 @@ public class WandItem extends Item {
         // עדכון מנא לפני הצגה
         ManaSystem.updateManaRegen(stack, level.getGameTime());
         
-        // החלפה ללחש הבא
-        SpellSelection.nextSpell(player.getUUID(), SpellManager.getSpellCount());
-        int selectedIndex = SpellSelection.getSelectedSpell(player.getUUID());
-        Spell selectedSpell = SpellManager.getSpellByIndex(selectedIndex);
+        // בדיקה כמה קסמים השחקן למד
+        int learnedSpellCount = SpellManager.getLearnedSpellCount(player);
+        if (learnedSpellCount == 0) {
+            player.sendSystemMessage(Component.literal("You haven't learned any spells yet! Find spell books to learn magic.")
+                .withStyle(ChatFormatting.RED));
+            player.sendSystemMessage(Component.literal(ManaSystem.getManaBar(stack)));
+            return;
+        }
         
-        player.sendSystemMessage(Component.literal("Selected spell: " + selectedSpell.getName()).withStyle(ChatFormatting.GOLD));
+        // החלפה ללחש הבא (רק בין קסמים נלמדים)
+        SpellSelection.nextSpell(player.getUUID(), learnedSpellCount);
+        int selectedIndex = SpellSelection.getSelectedSpell(player.getUUID());
+        
+        // קבל את הקסם הנלמד לפי האינדקס
+        List<Spell> learnedSpells = SpellManager.getLearnedSpells(player);
+        if (selectedIndex >= 0 && selectedIndex < learnedSpells.size()) {
+            Spell selectedSpell = learnedSpells.get(selectedIndex);
+            player.sendSystemMessage(Component.literal("Selected spell: " + selectedSpell.getName())
+                .withStyle(ChatFormatting.GOLD));
+        }
+        
         player.sendSystemMessage(Component.literal(ManaSystem.getManaBar(stack)));
     }
     
     private void castSpell(ItemStack stack, Level level, Player player) {
-        // שימוש בלחש הנבחר
+        // בדיקה כמה קסמים השחקן למד
+        List<Spell> learnedSpells = SpellManager.getLearnedSpells(player);
+        if (learnedSpells.isEmpty()) {
+            player.sendSystemMessage(Component.literal("You haven't learned any spells yet! Find spell books to learn magic.")
+                .withStyle(ChatFormatting.RED));
+            return;
+        }
+        
+        // שימוש בלחש הנבחר מתוך הקסמים הנלמדים
         int selectedIndex = SpellSelection.getSelectedSpell(player.getUUID());
-        boolean success = SpellManager.castSpell(selectedIndex, level, player);
-        if (!success) {
-            player.sendSystemMessage(Component.literal("The spell failed!"));
+        if (selectedIndex >= 0 && selectedIndex < learnedSpells.size()) {
+            Spell selectedSpell = learnedSpells.get(selectedIndex);
+            boolean success = selectedSpell.castWithWand(level, player, stack);
+            if (!success) {
+                player.sendSystemMessage(Component.literal("The spell failed!"));
+            }
+        } else {
+            player.sendSystemMessage(Component.literal("No spell selected! Hold crouch and right-click to switch spells.")
+                .withStyle(ChatFormatting.YELLOW));
         }
     }
 
@@ -236,12 +271,6 @@ public class WandItem extends Item {
             tooltip.add(Component.literal("Mana: " + mana + "/100").withStyle(ChatFormatting.BLUE));
         }
         
-        // הצגת כישוף נוכחי - בלי מידע מפורט
-        if (stack.hasTag() && stack.getTag().contains("selectedSpell")) {
-            int spellIndex = stack.getTag().getInt("selectedSpell");
-            if (spellIndex == 0) {
-                tooltip.add(Component.literal("Function: Light").withStyle(ChatFormatting.GOLD));
-            }
-        }
+        // לא מציג שום קסם נוכחי אם לא נלמד
     }
 }
